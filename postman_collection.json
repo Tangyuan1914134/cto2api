@@ -1,0 +1,184 @@
+{
+  "info": {
+    "name": "Web Reverse Proxy API",
+    "description": "API collection for Web Reverse Proxy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "masterApiKey",
+      "value": "default-api-key-please-change",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionApiKey",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Get API Info",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{masterApiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/info",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "info"]
+        }
+      }
+    },
+    {
+      "name": "Create Session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    const response = pm.response.json();",
+              "    pm.collectionVariables.set('sessionId', response.session.session_id);",
+              "    pm.collectionVariables.set('sessionApiKey', response.session.api_key);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{masterApiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"HTTPBin Test Session\",\n  \"description\": \"Test session using httpbin.org\",\n  \"target\": {\n    \"url\": \"https://httpbin.org/post\",\n    \"method\": \"POST\",\n    \"headers\": {\n      \"User-Agent\": \"WebReverseProxyAPI/1.0\"\n    }\n  },\n  \"input_mappings\": [\n    {\n      \"input_key\": \"message\",\n      \"target_field\": \"message\",\n      \"transport\": \"form\"\n    },\n    {\n      \"input_key\": \"user_id\",\n      \"target_field\": \"user_id\",\n      \"transport\": \"form\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/sessions",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "sessions"]
+        }
+      }
+    },
+    {
+      "name": "List Sessions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{masterApiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/sessions",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "sessions"]
+        }
+      }
+    },
+    {
+      "name": "Get Session Details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{masterApiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/sessions/{{sessionId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "sessions", "{{sessionId}}"]
+        }
+      }
+    },
+    {
+      "name": "Execute Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{sessionApiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"payload\": {\n    \"message\": \"Hello from Postman!\",\n    \"user_id\": \"12345\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/sessions/{{sessionId}}/execute",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "sessions", "{{sessionId}}", "execute"]
+        }
+      }
+    },
+    {
+      "name": "Delete Session",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{masterApiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/sessions/{{sessionId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "sessions", "{{sessionId}}"]
+        }
+      }
+    }
+  ]
+}
